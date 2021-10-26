@@ -52,7 +52,7 @@ and_1 = AND([.5, .5], True)
 and_2 = AND([.5, .5], True)
 and_3 = AND([and_1, and_2], False)
 """
-"""
+
 and_1 = AND([.5, .5], True)
 xor_1 = XOR([.5, .5], True)
 and_2 = AND([.5, .5], True)
@@ -68,9 +68,10 @@ xor_3 = XOR([xor_2, and_5], False)
 and_7 = AND([or_3, and_6], False)
 or_4 = OR([and_6, xor_3], False)
 and_8 = AND([and_7, or_4], False)
-"""
+
 
 total_leakage = 0
+
 visited = {}
 
 def propagate(node):  #returns the output probability of the given node and stores total leakage in the total_leakage global variable
@@ -83,9 +84,20 @@ def propagate(node):  #returns the output probability of the given node and stor
         return visited[node]
     else:
         #x1 = concurrent.futures.ThreadPoolExecutor().submit(propagate, node.inputs[0]).result() concurrency slows it down for small circuits
-        x1 = propagate(node.inputs[0])
+        if isinstance(node.inputs[0], float):
+            x1 = node.inputs[0]
+        elif node.inputs[0] not in visited.keys():
+            x1 = propagate(node.inputs[0])
+        else:
+            x1 = visited[node.inputs[0]]
         #x2 = concurrent.futures.ThreadPoolExecutor().submit(propagate, node.inputs[1]).result()
-        x2 = propagate(node.inputs[1])
+        if isinstance(node.inputs[1], float):
+            x2 = node.inputs[1]
+        elif node.inputs[1] not in visited.keys():
+            x2 = propagate(node.inputs[1])
+        else:
+            x2 = visited[node.inputs[1]]
+
         if node not in visited.keys():
             total_leakage += node.getLeakage(x1, x2)
             visited[node] = node.getOutput(x1, x2)
@@ -93,7 +105,9 @@ def propagate(node):  #returns the output probability of the given node and stor
 
 pre_time = time.time_ns()
 for i in range(100):
-    propagate() #put tail node inside parantheses after decommenting that circuit above
+    total_leakage = 0
+    visited = {}
+    propagate(and_8) #put tail node inside parantheses after decommenting that circuit above
 post_time = time.time_ns()
 print(total_leakage)
 delta_t = post_time - pre_time
