@@ -4,6 +4,12 @@ processed_inputs = [[.5, .5], [.6, .4], [.4, .6], [.2, .8]] #[[x1', x1], [x2', x
 
 b_list = [0, 0, 0, 0]
 
+def processInputs(o_inputs):
+    p_list = []
+    for i in range(len(o_inputs)):
+        p_list.append([1 - o_inputs[i], o_inputs[i]])
+    return p_list
+
 def addOneBinary(b_list):
     carry = False
     for i in range(len(b_list)):
@@ -32,7 +38,7 @@ def getStateProbabilities(p_inputs, b_list):
         addOneBinary(b_list)
     return probabilities
 
-print(getStateProbabilities(processed_inputs, b_list))
+print(getStateProbabilities(processInputs(original_inputs), b_list))
 
 
 
