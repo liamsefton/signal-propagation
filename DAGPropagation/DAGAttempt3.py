@@ -1,6 +1,6 @@
 """
 Made by: Liam Sefton
-Fucking sick ass algorithm that propagates a signal recursively
+Cool algorithm that propagates a signal recursively through a tree structure of logical gates (gates are limited to 2 inputs and any number of outputs)
 """
 import concurrent.futures
 import time
