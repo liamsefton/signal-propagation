@@ -1,0 +1,39 @@
+library(XORdesign){
+ leakage_power_unit : "1pW";
+ voltage_unit : "1V";
+ default_cell_leakage_power : 0;
+ nom_temperature : 0;
+ cell (XOR1){
+   area : 3;
+   leakage_power(){
+      value : 10;
+      when : "(A * B)";
+      related_pg_pin : VDD;
+   }
+   leakage_power(){
+      value : 5;
+      when : "(A * !B)";
+      related_pg_pin : VDD;
+   }
+   leakage_power(){
+      value : 15;
+      when : "(!A * B)";
+      related_pg_pin : VDD;
+   }
+   leakage_power(){
+      value : 20;
+      when : "(!A * !B)";
+      related_pg_pin : VDD;
+   }
+   pin (A) {
+      direction : input;
+   }
+   pin (B) {
+      direction : input;
+   }
+   pin (Y) {
+      direction : output;
+      function : "(A * !B) + (!A * B)";
+   }
+  }
+}
