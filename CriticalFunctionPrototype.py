@@ -3,7 +3,7 @@ import networkx as nx
 from liberty.parser import parse_liberty
 import sys
 
-#Cell class used for propagation the probabilities through a liberty function
+#Cell class used for propagating the probabilities through a liberty function
 class Cell:
     def __init__(self, liberty_function, inputs, name):
         self.lib_func = liberty_function
