@@ -1,3 +1,8 @@
+#DO FIRST
+#pip3 install liberty-parser
+#pip3 install networkx
+#put liberty.lib file in same folder as this program
+#put netlistStruct.txt in same folder as this program
 from liberty.types import EscapedString
 import networkx as nx
 from liberty.parser import parse_liberty
