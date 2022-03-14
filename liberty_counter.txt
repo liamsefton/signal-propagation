@@ -1,0 +1,191 @@
+library(XORdesign){
+ leakage_power_unit : "1pW";
+ voltage_unit : "1V";
+ default_cell_leakage_power : 0;
+ nom_temperature : 0;
+ cell (XOR1){
+   area : 3;
+   leakage_power(){
+        value : 30;
+        when : "A&B";
+	related_pg_pin : "vdd";
+   }
+   leakage_power(){
+        value : 15;
+        when : "A&!B";
+	related_pg_pin : "vdd";
+   }
+   leakage_power(){
+        value : 12;
+        when : "!A&B";
+	related_pg_pin : "vdd";
+   }
+   leakage_power(){
+        value : 9;
+        when : "!A&!B";
+	related_pg_pin : "vdd";
+   }
+   pin (A) {
+      direction : input;
+   }
+   pin (B) {
+      direction : input;
+   }
+   pin (Y) {
+      direction : output;
+      function : "A^B"
+   }
+   pg_pin("vdd_sub"){
+	voltage_name : "vdd_sub";
+	pg_type : "nwell";
+	physical_connection : "device_layer";
+   }
+      pg_pin("vdd"){
+	voltage_name : "vdd";
+	pg_type : "primary_power";
+	related_bias_pin : "vdd_sub";
+   }
+      pg_pin("vss"){
+	voltage_name : "vss";
+	pg_type : "primary_ground";
+   }
+}
+cell (AND){
+   area : 3;
+   leakage_power(){
+        value : 30;
+        when : "A&B";
+	related_pg_pin : "vdd";
+   }
+   leakage_power(){
+        value : 15;
+        when : "A&!B";
+	related_pg_pin : "vdd";
+   }
+   leakage_power(){
+        value : 12;
+        when : "!A&B";
+	related_pg_pin : "vdd";
+   }
+   leakage_power(){
+        value : 9;
+        when : "!A&!B";
+	related_pg_pin : "vdd";
+   }
+   pin (A) {
+      direction : input;
+   }
+   pin (B) {
+      direction : input;
+   }
+   pin (Y) {
+      direction : output;
+      function : "A&B"
+   }
+   pg_pin("vdd_sub"){
+	voltage_name : "vdd_sub";
+	pg_type : "nwell";
+	physical_connection : "device_layer";
+   }
+      pg_pin("vdd"){
+	voltage_name : "vdd";
+	pg_type : "primary_power";
+	related_bias_pin : "vdd_sub";
+   }
+      pg_pin("vss"){
+	voltage_name : "vss";
+	pg_type : "primary_ground";
+   }
+}
+   //refer to cell (r0hd_ln6_tsmc_df1t02p00) in sample.lib exmaple
+   cell (dff){
+	pin_name_map(clk, d, q);
+ 	driver_waveform_rise : "driver_waveform_default_rise" ;
+ 	driver_waveform_fall : "driver_waveform_default_fall" ;
+	is_lvf_hold : true;
+	is_lvf_setup : true;
+   }
+   leakge_power() {
+	related_pg_pin : "vdd";
+	when : "clk&d&q";
+	value : 20.0;
+   }
+   leakge_power() {
+	related_pg_pin : "vdd";
+	when : "clk&d&!q";
+	value : 20.0;
+   }
+   leakge_power() {
+	related_pg_pin : "vdd";
+	when : "clk&!d&q";
+	value : 20.0;
+   }
+   leakge_power() {
+	related_pg_pin : "vdd";
+	when : "clk&!d&!q";
+	value : 20.0;
+   }
+   leakge_power() {
+	related_pg_pin : "vdd";
+	when : "!clk&d&q";
+	value : 20.0;
+   }
+   leakge_power() {
+	related_pg_pin : "vdd";
+	when : "!clk&d&!q";
+	value : 20.0;
+   }
+   leakge_power() {
+	related_pg_pin : "vdd";
+	when : "!clk&!d&q";
+	value : 20.0;
+   }
+   leakge_power() {
+	related_pg_pin : "vdd";
+	when : "clk&!d&!q";
+	value : 20.0;
+   }
+   pin(clk){
+	clock : true;
+	direction : input;
+	driver_waveform_rise : "driver_waveform_default_rise" ;
+ 	driver_waveform_fall : "driver_waveform_default_fall" ;
+	related_ground_pin: vss;
+	related_power_pin: vdd;
+   }
+   pin(d){
+	clock : true;
+	direction : input;
+	driver_waveform_rise : "driver_waveform_default_rise" ;
+ 	driver_waveform_fall : "driver_waveform_default_fall" ;
+	related_ground_pin: vss;
+	related_power_pin: vdd;
+   }
+   pin(q){
+	direction : output;
+	function : "IQ";
+	max_capacitance : 10.0;
+	min_capacitance : 10.0e-05;
+	output_voltage : default;
+	related_ground_pin : vss;
+	related_power_pin : vdd;
+   }
+   ff(IQ, IQN){
+	clocked_on : "clk" ;
+	next_state : "d" ;
+   }
+   pg_pin("vdd_sub"){
+	voltage_name : "vdd_sub";
+	pg_type : "nwell";
+	physical_connection : "device_layer";
+   }
+      pg_pin("vdd"){
+	voltage_name : "vdd";
+	pg_type : "primary_power";
+	related_bias_pin : "vdd_sub";
+   }
+      pg_pin("vss"){
+	voltage_name : "vss";
+	pg_type : "primary_ground";
+   }
+}

@@ -1,0 +1,67 @@
+module top(N_0_0, N_8_1, N_8_2, N_8_3,N_8_4, N_8_5);
+
+input N_0_0;
+
+output N_8_1:
+output N_8_2;
+output N_8_3;
+output N_8_4;
+output N_8_5;
+
+wire N_0_1:
+wire N_1_1;
+wire N_2_1;
+wire N_3_1;
+wire N_4_1;
+wire N_5_1;
+wire N_6_1;
+wire N_7_1;
+wire N_0_2:
+wire N_1_2;
+wire N_2_2;
+wire N_3_2;
+wire N_4_2;
+wire N_5_2;
+wire N_6_2;
+wire N_7_2;
+wire N_0_3:
+wire N_1_3;
+wire N_2_3;
+wire N_3_3;
+wire N_4_3;
+wire N_5_3;
+wire N_6_3;
+wire N_7_3;
+wire N_0_4:
+wire N_1_4;
+wire N_2_4;
+wire N_3_4;
+wire N_4_4;
+wire N_5_4;
+wire N_6_4;
+wire N_7_4;
+wire N_0_4:
+wire N_1_5;
+wire N_2_5;
+wire N_3_5;
+wire N_4_5;
+wire N_5_5;
+wire N_6_5;
+wire N_7_5;
+
+XOR XOR_1 (.Y(N_2_1), .A(N_0_0), .B(N_3_1));
+XOR XOR_2 (.Y(N_2_2), .A(N_0_1), .B(N_3_2));
+XOR XOR_3 (.Y(N_2_3), .A(N_0_2), .B(N_3_3));
+XOR XOR_4 (.Y(N_2_4), .A(N_0_3), .B(N_3_4));
+AND AND_1 (.Y(N_0_2), .A(N_0_0), .B(N_3_1));
+AND AND_2 (.Y(N_0_3), .A(N_0_2), .B(N_3_2));
+AND AND_3 (.Y(N_0_4), .A(N_0_3), .B(N_3_3));
+AND AND_4 (.Y(N_0_5), .A(N_0_4), .B(N_3_4));
+dff dff_1 (.q(N_3_1), .d(N_2_1));
+dff dff_1 (.q(N_3_2), .d(N_2_2));
+dff dff_1 (.q(N_3_3), .d(N_2_3));
+dff dff_1 (.q(N_3_4), .d(N_2_4));
+
+
+
+endmodule
