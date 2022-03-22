@@ -6,16 +6,7 @@ import Verific
 import networkx as nx
 from liberty.parser import parse_liberty
 
-#*******************************************************
-#******** DATABASE EXAMPLE #1 ***************************
-#*******************************************************
-#
-#               NOTE TO THE READER:
-#
-#  Here is an example on how to read a Synopsys Liberty file.
-#
-#*******************************************************/
-
+#This function is from the Verific example and is used for elaborating the netlist-liberty pair
 def Accumulate(nl,done):
     if not nl:
         return
@@ -28,6 +19,7 @@ def Accumulate(nl,done):
         inst = inst_iter.Next()
     done.Insert(nl)
 
+#cell class used for propagation
 class Cell:
     def __init__(self, cell_type, inputs, name):
         self.cell_type = cell_type
@@ -42,7 +34,7 @@ class Cell:
             else:
                 self.inputs[key] = cell_dict[self.inputs[key]].output
 
-    def calculate_output(self, lib_dict):
+    def calculate_output(self, lib_dict): #very simple placeholder function
         func = lib_dict[self.cell_type][0]
         if "Q" in func:
             self.output = .5
@@ -54,7 +46,7 @@ class Cell:
             else:
                 self.output = .5
 
-    def get_leakage(self, lib_dict):
+    def get_leakage(self, lib_dict): #very simple placeholder function
         ret = 0
         if "Q" in lib_dict[self.cell_type][0]:
             #count = 0
@@ -80,7 +72,7 @@ class Cell:
         return "{" + self.cell_type + ", " + str(self.inputs) + ", " + self.name + "}"
 
 
-#CELL DICT: {CELL_NAME : (CELL_FUNCTION, {WHEN_VALUE : LEAKAGE VALUE})} 
+#LIB DICT: {CELL_TYPE_NAME : (CELL_FUNCTION, {WHEN_VALUE : LEAKAGE VALUE})} 
 library = parse_liberty(open("liberty_counter4.lib").read())
 cell_groups = library.get_groups('cell')
 lib_dict = {}
@@ -100,22 +92,14 @@ print(lib_dict)
 
 
 synlib_reader = Verific.synlib_file()
-#synlib_reader.Read("example.lib","work")
-#synlib_reader.Read("example_modified.lib", "work")
 synlib_reader.Read("liberty_counter4.lib", "work")
-#synlib_reader.Analyze("liberty_counter.lib")
-#synlib_reader.Analyze("example.lib")
 
 nl_reader = Verific.veri_nl_file()
 nl_reader.Read("netlist_counter.v","work")
-#nl_reader.Read("test.v", "work")
-#nl_reader.Read("test_modified2.v", "work")
 
 top = Verific.Netlist_PresentDesign()
-#top.SaveToFile("cool.txt")
-#top = Verific.Netlist_PresentDesign()
-print ("INFO: top level design is %s(%s)" % (top.Owner().Name(), top.Name()))
 
+print ("INFO: top level design is %s(%s)" % (top.Owner().Name(), top.Name()))
 set = Verific.Set()
 Accumulate(top,set)
 
@@ -126,16 +110,12 @@ connections_list = []
 netlist = set_iter.First()
 
 while netlist:
-    if netlist.Owner().Name() == "top":
+    if netlist.Owner().Name() == "top": #right now it only analyzes the module named top
         instances_map = Verific.InstanceMapIter(netlist.GetInsts())
         instance = instances_map.First()
         while instance:
             print(" INSTANCE NAME: " + instance.Name() + " Cell Type: " + instance.View().Owner().Name())
             atts_map = Verific.AttMapIter(instance.View().GetAtts())
-            att = atts_map.First()
-            while att:
-                print("ATT KEY: " + str(att.Key()) + " ----> " + str(att.Value()))
-                att = atts_map.Next()
             port_refs_map = Verific.PortRefMapIter(instance.GetPortrefs())
             port_ref = port_refs_map.First()
             port_dict = {}
@@ -144,11 +124,11 @@ while netlist:
                     try:
                         port_dict[port_ref.GetPort().Name()] = port_ref.GetNet().Driver().Name()
                         if "Q" in lib_dict[port_ref.GetNet().Driver().View().Owner().Name()][0]:
-                            port_dict[port_ref.GetPort().Name()] = .5
+                            port_dict[port_ref.GetPort().Name()] = .5 #if the cell driving the current input port is sequential, set input to be .5
                         if "Q" not in lib_dict[instance.View().Owner().Name()][0]:
-                        	connections_list.append((port_ref.GetNet().Driver().Name(), instance.Name()))
+                        	connections_list.append((port_ref.GetNet().Driver().Name(), instance.Name())) #if current instance is not sequential, add an edge to the connection list with the current instance as the cell taking input
                     except:
-                        port_dict[port_ref.GetPort().Name()] = .5
+                        port_dict[port_ref.GetPort().Name()] = .5 #default value
 
                     print("        Input port: " + port_ref.GetPort().Name())
                 else:
@@ -156,7 +136,7 @@ while netlist:
 
                 port_ref = port_refs_map.Next()
             print(port_dict)
-            cell_dict[instance.Name()] = Cell(str(instance.View().Owner().Name()), port_dict, instance.Name())
+            cell_dict[instance.Name()] = Cell(str(instance.View().Owner().Name()), port_dict, instance.Name()) #add instance to cell dict for referencing
 
             instance = instances_map.Next()
 
