@@ -18,12 +18,12 @@ except NameError:
 calc_grammar = """
     ?start: or
     ?or: and
-        | or "|" and -> str_or
+        | or "|" and -> str_or2
     ?and: xor
-        | and "&" xor -> str_and
+        | and "&" xor -> str_and2
     ?xor: pin
-        | xor "^" pin -> str_xor
-    ?pin: NAME   
+        | xor "^" pin -> str_xor2
+    ?pin: NAME -> var
          | "!" pin         -> str_not
          | "(" or ")"
     %import common.CNAME -> NAME
@@ -43,73 +43,20 @@ class CalculateTree(Transformer):
         self.pin_dict = pin_dict
         self.vars = {}
 
-    def assign_var(self, name):
-        self.vars[name] = self.pin_dict[name]
-        return self.pin_dict[name]
+    def str_xor2(self, a, b):
+        return "prob_xor(" + a + ", " + b + ")"
 
-    def prob_xor(self, a, b):
-        if type(a) != float:
-            a = self.pin_dict[a]
-        if type(b) != float:
-            b = self.pin_dict[b]
-        return a - 2*a*b + b
+    def str_and2(self, a, b):
+        return "prob_and(" + a + ", " + b + ")"
 
-    def str_xor(self, a, b):
-        if a[-1] == ")" and b[-1] == ")":
-            return "prob_xor(" + a + ", " + b + ")"
-        elif a[-1] == ")":
-            return "prob_xor(" + a + ", pin_dict[\"" + b + "\"])"
-        elif b[-1] == ")":
-            return "prob_xor(pin_dict[\"" + a + "\"], " + b + ")"
-        return "prob_xor(pin_dict[\"" + a + "\"], pin_dict[\"" + b + "\"])"
-
-    def prob_and(self, a, b):
-        if type(a) != float:
-            a = self.pin_dict[a]
-        if type(b) != float:
-            b = self.pin_dict[b]
-        return a * b
-
-    def str_and(self, a, b):
-        if a[-1] == ")" and b[-1] == ")":
-            return "prob_and(" + a + ", " + b + ")"
-        elif a[-1] == ")":
-            return "prob_and(" + a + ", pin_dict[\"" + b + "\"])"
-        elif b[-1] == ")":
-            return "prob_and(pin_dict[\"" + a + "\"], " + b + ")"
-        return "prob_and(pin_dict[\"" + a + "\"], pin_dict[\"" + b + "\"])"
-
-    def prob_or(self, a, b):
-        if type(a) != float:
-            a = self.pin_dict[a]
-        if type(b) != float:
-            b = self.pin_dict[b]
-        return a + b - a*b
-
-    def str_or(self, a, b):
-        if a[-1] == ")" and b[-1] == ")":
-            return "prob_or(" + a + ", " + b + ")"
-        elif a[-1] == ")":
-            return "prob_or(" + a + ", pin_dict[\"" + b + "\"])"
-        elif b[-1] == ")":
-            return "prob_or(pin_dict[\"" + a + "\"], " + b + ")"
-        return "prob_or(pin_dict[\"" + a + "\"], pin_dict[\"" + b + "\"])"
-
-    def prob_not(self, a):
-        if type(a) != float:
-            a = self.pin_dict[a]
-        return 1 - a
+    def str_or2(self, a, b):
+        return "prob_or(" + a + ", " + b + ")"
 
     def str_not(self, a):
-        if a[-1] == ")":
-            return "(1 - (" + a + "))"
-        return "(1 - (" + "pin_dict[\"" + a + "\"]" + "))"
+        return "(1 - " + a + ")"
 
     def var(self, a):
-        try:
-            return self.pin_dict[a]
-        except KeyError:
-            raise Exception("Variable not found: %s" % a)
+        return "pin_dict[\"" + a + "\"]"
 
 pd = {'A' : .5, 'B' : .5, 'C' : .5, 'D': .5, 'E' : .5}
 calc_parser = Lark(calc_grammar, parser='lalr', transformer=CalculateTree(pd))
